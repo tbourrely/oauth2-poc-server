@@ -72,24 +72,33 @@ $container['AuthorizationServer'] = function( $container ) {
         $publicKey
     );
 
+    //    --- Authorization Code Grant Type ---
     $grant = new League\OAuth2\Server\Grant\AuthCodeGrant(
         $authCodeRepository,
         $refreshTokenRepository,
         new DateInterval('PT1H')
     );
-
     $server->setEncryptionKey( file_get_contents( $encryptionKey ) );
-
     $server->enableGrantType(
         $grant,
         new DateInterval('PT1H')
     );
 
-//    --- Client Grant Type ---
-//    $server->enableGrantType(
-//        new \League\OAuth2\Server\Grant\ClientCredentialsGrant(),
-//        new DateInterval('PT1H')
-//    );
+    //    --- Refresh Token Grant Type ---
+    $refresh = new League\OAuth2\Server\Grant\RefreshTokenGrant(
+        $refreshTokenRepository
+    );
+    $refresh->setRefreshTokenTTL(new DateInterval('P1M'));
+    $server->enableGrantType(
+        $refresh,
+        new DateInterval('PT1H')
+    );
+
+    //    --- Client Grant Type ---
+    $server->enableGrantType(
+        new \League\OAuth2\Server\Grant\ClientCredentialsGrant(),
+        new DateInterval('PT1H')
+    );
 
     return $server;
 

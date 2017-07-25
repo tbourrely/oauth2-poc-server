@@ -42,7 +42,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
             $authCodeModel->user_id = $authCodeEntity->getUserIdentifier();
             $authCodeModel->redirect_uri = $authCodeEntity->getRedirectUri();
             $authCodeModel->expire_date = $authCodeEntity->getExpiryDateTime()->format('Y-m-d H:i:s');
-            $authCodeModel->scope_id = $authCodeEntity->getScopes()[0]->getIdentifier();
+            $authCodeModel->scope_id = $authCodeEntity->stringScopes();
 
             $authCodeModel->save();
         }
@@ -53,7 +53,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function revokeAuthCode($codeId)
     {
-        // TODO: Implement revokeAuthCode() method.
+        AuthCode::where( 'authorization_code', '=', $codeId )->delete();
     }
 
     /**
@@ -62,7 +62,11 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function isAuthCodeRevoked($codeId)
     {
-        // TODO: Implement isAuthCodeRevoked() method.
+        $code = AuthCode::where( 'authorization_code', '=', $codeId )->first();
+
+        if ( empty( $code->authorization_code ) )
+            return true;
+
         return false;
     }
 }

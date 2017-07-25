@@ -41,16 +41,6 @@ class AuthCode extends Model
     }
 
     /**
-     * Return scope
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function scope()
-    {
-        return $this->belongsTo( 'server\models\Scope' );
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()

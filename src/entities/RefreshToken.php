@@ -47,7 +47,6 @@ class RefreshToken implements RefreshTokenEntityInterface
     public function setIdentifier($identifier)
     {
         $this->refreshTokenModel->refresh_token = $identifier;
-        $this->refreshTokenModel->save();
     }
 
     /**
@@ -64,7 +63,6 @@ class RefreshToken implements RefreshTokenEntityInterface
     public function setExpiryDateTime(\DateTime $dateTime)
     {
         $this->refreshTokenModel->expire_date = $dateTime->format('Y-m-d H:i:s');
-        $this->refreshTokenModel->save();
     }
 
     /**
@@ -73,7 +71,6 @@ class RefreshToken implements RefreshTokenEntityInterface
     public function setAccessToken(AccessTokenEntityInterface $accessToken)
     {
         $this->refreshTokenModel->access_token = $accessToken->getIdentifier();
-        $this->refreshTokenModel->save();
     }
 
     /**

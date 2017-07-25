@@ -13,6 +13,7 @@ use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 use server\entities\Client as ClientEntity;
 use server\entities\Scope as ScopeEntity;
+use server\models\Scope;
 
 /**
  * Class AuthCode
@@ -50,7 +51,6 @@ class AuthCode implements AuthCodeEntityInterface
     public function setRedirectUri($uri)
     {
         $this->authCodeModel->redirect_uri = $uri;
-        $this->authCodeModel->save();
     }
 
     /**
@@ -67,7 +67,6 @@ class AuthCode implements AuthCodeEntityInterface
     public function setIdentifier($identifier)
     {
         $this->authCodeModel->authorization_code = $identifier;
-        $this->authCodeModel->save();
     }
 
     /**
@@ -84,7 +83,6 @@ class AuthCode implements AuthCodeEntityInterface
     public function setExpiryDateTime(\DateTime $dateTime)
     {
         $this->authCodeModel->expire_date = $dateTime->format('Y-m-d H:i:s');
-        $this->authCodeModel->save();
     }
 
     /**
@@ -93,7 +91,6 @@ class AuthCode implements AuthCodeEntityInterface
     public function setUserIdentifier($identifier)
     {
         $this->authCodeModel->user_id = $identifier;
-        $this->authCodeModel->save();
     }
 
     /**
@@ -119,7 +116,6 @@ class AuthCode implements AuthCodeEntityInterface
     public function setClient(ClientEntityInterface $client)
     {
         $this->authCodeModel->client_id = $client->getIdentifier();
-        $this->authCodeModel->save();
     }
 
     /**
@@ -127,8 +123,7 @@ class AuthCode implements AuthCodeEntityInterface
      */
     public function addScope(ScopeEntityInterface $scope)
     {
-        $this->authCodeModel->scope_id = $scope->getIdentifier();
-        $this->authCodeModel->save();
+        $this->authCodeModel->scope_id .= trim( $scope->getIdentifier() ) . ' ';
     }
 
     /**
@@ -136,7 +131,26 @@ class AuthCode implements AuthCodeEntityInterface
      */
     public function getScopes()
     {
-        $scope = $this->authCodeModel->scope()->first();
-        return [new ScopeEntity( $scope )];
+        $scopes_list = preg_split('/\s+/', $this->authCodeModel->scope_id);
+
+        $scopes = array();
+
+        foreach ( $scopes_list as $scope ) {
+            $scope_model = Scope::where( 'scope', '=', $scope )->first();
+
+            if ( !empty( $scope_model->scope ) ) {
+                array_push( $scopes, new ScopeEntity( $scope_model ) );
+            }
+        }
+
+        return $scopes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function stringScopes()
+    {
+        return $this->authCodeModel->scope_id;
     }
 }

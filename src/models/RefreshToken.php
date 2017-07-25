@@ -29,32 +29,4 @@ class RefreshToken extends Model
     /*******************
      * END OF ELOQUENT CONFIG
      *******************/
-
-    /**
-     * Return the associated client
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function client()
-    {
-        return $this->belongsTo( 'server\models\Client' );
-    }
-
-    /**
-     * Return scope
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function scope()
-    {
-        return $this->belongsTo( 'server\models\Scope' );
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
-    {
-        return $this->belongsTo( 'mainApp\models\User' );
-    }
 }

@@ -30,34 +30,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
     {
-        $tokenModel = new AccessToken();
-
-        $date = new \DateTime('tomorrow');
-        $date = $date->format('Y-m-d H:i:s');
-
-        $generated_token = md5(uniqid( $clientEntity->getIdentifier(), true ));
-
-
-
-        $token = $tokenModel->firstOrNew(
-            [
-                'client_id' => $clientEntity->getIdentifier()
-            ]
-        );
-
-       if ( empty( $token->access_token ) ) {
-
-
-
-           $token->access_token = $generated_token;
-           $token->user_id = $userIdentifier;
-           $token->expire_date = $date;
-           $token->scope_id = 0; // testing
-
-           $token->save();
-       }
-
-       return new AccessTokenEntity( $token );
+       return new AccessTokenEntity( new AccessToken() );
     }
 
     /**
@@ -65,7 +38,17 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function persistNewAccessToken(AccessTokenEntityInterface $accessTokenEntity)
     {
-        // TODO: Implement persistNewAccessToken() method.
+        AccessToken::updateOrCreate(
+            [
+                'client_id'     => $accessTokenEntity->getClient()->getIdentifier(),
+            ],
+            [
+                'access_token'  => $accessTokenEntity->getIdentifier(),
+                'expire_date'   => $accessTokenEntity->getExpiryDateTime()->format('Y-m-d H:i:s'),
+                'scope_id'      => $accessTokenEntity->stringScopes(),
+                'user_id'       => $accessTokenEntity->getUserIdentifier()
+            ]
+        );
     }
 
     /**
@@ -73,7 +56,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function revokeAccessToken($tokenId)
     {
-        // TODO: Implement revokeAccessToken() method.
+        AccessToken::where( 'access_token', '=', $tokenId )->delete();
     }
 
     /**
@@ -82,7 +65,11 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function isAccessTokenRevoked($tokenId)
     {
-        // TODO: Implement isAccessTokenRevoked() method.
+        $token = AccessToken::where( 'access_token', '=', $tokenId )->first();
+
+        if ( empty( $token->access_token ) )
+            return true;
+
         return false;
     }
 }

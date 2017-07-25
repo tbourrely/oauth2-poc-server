@@ -21,10 +21,11 @@ class Scope extends Model
      *******************/
     protected $connection   = 'server';
     protected $table        = 'scopes';
-    protected $primaryKey   = 'scope_id';
-    protected $fillable     = ['scope_id', 'scope', 'is_default'];
+    protected $primaryKey   = 'scope';
+    protected $fillable     = ['scope', 'is_default'];
 
     public $timestamps      = false;
+    public $incrementing    = false;
     /*******************
      * END OF ELOQUENT CONFIG
      *******************/
@@ -35,16 +36,6 @@ class Scope extends Model
      */
     public function getById( $id )
     {
-        return $this->where('scope_id', '=', $id)->first();
-    }
-
-    /**
-     * Return tokens
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function tokens()
-    {
-        return $this->hasMany( 'server\models\AccessToken' );
+        return $this->where('scope', '=', $id)->first();
     }
 }

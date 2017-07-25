@@ -26,9 +26,9 @@ class Scope implements ScopeEntityInterface
      * @param $scope
      * @param $default
      */
-    public function __construct( $scope )
+    public function __construct( $scopeObj )
     {
-        $this->scopeModel = $scope;
+        $this->scopeModel = $scopeObj;
     }
 
     /**
@@ -36,7 +36,7 @@ class Scope implements ScopeEntityInterface
      */
     public function getIdentifier()
     {
-        return $this->scopeModel->scope_id;
+        return $this->scopeModel->scope;
     }
 
     /**
@@ -44,7 +44,7 @@ class Scope implements ScopeEntityInterface
      */
     public function jsonSerialize()
     {
-        return $this->scopeModel->scope_id;
+        return $this->scopeModel->scope;
     }
 
     /**

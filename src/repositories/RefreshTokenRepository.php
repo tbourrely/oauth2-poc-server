@@ -43,7 +43,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function revokeRefreshToken($tokenId)
     {
-        // TODO: Implement revokeRefreshToken() method.
+        RefreshToken::where( 'refresh_token', '=', $tokenId )->delete();
     }
 
     /**
@@ -52,7 +52,11 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function isRefreshTokenRevoked($tokenId)
     {
-        // TODO: Implement isRefreshTokenRevoked() method.
+        $token = RefreshToken::where( 'refresh_token', '=', $tokenId )->first();
+
+        if ( empty( $token->refresh_token ) )
+            return true;
+
         return false;
     }
 }

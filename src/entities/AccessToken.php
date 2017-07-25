@@ -17,6 +17,7 @@ use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 use server\entities\Client as ClientEntity;
 use server\entities\Scope as ScopeEntity;
+use server\models\Scope;
 
 
 /**
@@ -75,7 +76,6 @@ class AccessToken implements AccessTokenEntityInterface
     public function setIdentifier( $identifier )
     {
         $this->token->access_token = $identifier;
-        $this->token->save();
     }
 
     /**
@@ -92,7 +92,6 @@ class AccessToken implements AccessTokenEntityInterface
     public function setExpiryDateTime(\DateTime $dateTime)
     {
         $this->token->expire_date = $dateTime->format('Y-m-d H:i:s');
-        $this->token->save();
     }
 
     /**
@@ -101,7 +100,6 @@ class AccessToken implements AccessTokenEntityInterface
     public function setUserIdentifier($identifier)
     {
         $this->token->user_id = $identifier;
-        $this->token->save();
     }
 
     /**
@@ -127,7 +125,6 @@ class AccessToken implements AccessTokenEntityInterface
     public function setClient(ClientEntityInterface $client)
     {
         $this->token->client_id = $client->getIdentifier();
-        $this->token->save();
     }
 
     /**
@@ -135,8 +132,7 @@ class AccessToken implements AccessTokenEntityInterface
      */
     public function addScope(ScopeEntityInterface $scope)
     {
-        $this->token->scope_id = $scope->getIdentifier();
-        $this->token->save();
+        $this->token->scope_id .= trim( $scope->getIdentifier() ) . ' ';
     }
 
     /**
@@ -144,7 +140,26 @@ class AccessToken implements AccessTokenEntityInterface
      */
     public function getScopes()
     {
-        $scope = $this->token->scope()->first();
-        return [ new ScopeEntity( $scope ) ];
+        $scopes_list = preg_split('/\s+/', $this->token->scope_id);
+
+        $scopes = array();
+
+        foreach ( $scopes_list as $scope ) {
+            $scope_model = Scope::where( 'scope', '=', $scope )->first();
+
+            if ( !empty( $scope_model->scope ) ) {
+                array_push( $scopes, new ScopeEntity( $scope_model ) );
+            }
+        }
+
+        return $scopes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function stringScopes()
+    {
+        return $this->token->scope_id;
     }
 }

@@ -25,12 +25,12 @@ class ScopeRepository implements ScopeRepositoryInterface
      */
     public function getScopeEntityByIdentifier( $identifier )
     {
-        $scopeModel = new Scope();
 
-        $scope = $scopeModel->getById( $identifier );
 
-        if ( !empty( $scope->scope_id ) ) {
-            return new ScopeEntity( $scope );
+        $scopeModel = Scope::where( 'scope', $identifier )->first();
+
+        if ( !empty( $scopeModel->scope ) ) {
+            return new ScopeEntity( $scopeModel );
         }
 
         return null;
